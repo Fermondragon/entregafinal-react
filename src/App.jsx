@@ -1,60 +1,45 @@
-import { useState, useEffect } from "react";
 import "./App.css";
 
-//Firebase
-import { db } from "./firebase/firebaseConfig";
-import { collection, query, getDocs } from "firebase/firestore";
-import CardMuebles from "./components/CardMuebles/CardMuebles";
+// React Router Dom
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
+// Pages
+import HomePage from "./views/Home/HomePage";
+import AboutPage from "./views/About/AboutPage";
+import ContactPage from "./views/Contact/ContactPage";
+import ShopPage from "./views/Shop/ShopPage";
+import PlayerDetailPage from "./views/PlayerDetail/PlayerDetailPage";
+import PlayerPositionPage from "./views/PlayerPosition/PlayerPositionPage";
+
+// CONTEXT
+import { PlayersProvider } from "./context/PlayersContext";
+
+// COMPONENTS
+import Header from "./components/Header/Header";
+import ResponsiveNavigation from "./components/ResponsiveNavigation/ResponsiveNavigation";
 
 const App = () => {
-    const [mueblesData, setMueblesData] = useState([]);
-    const [escritoriosData, setEscritoriosData] = useState([]);
-
-    useEffect (() => {
-        const getMuebles = async () => {                    
-            const qC = query (collection(db, "comedores")
-            //,where("precio","in", [1000,20000]) donde el precio sea 1000 y 20000 (se pueden poner mas valores)
-            ); //y te traera la info del valor exacto, se pueden poner <,<=,==,>,>=,!=,array-contains,array-contains-any,in,not-in
-            const docsC =[];
-            const querySnapshotC = await getDocs(qC);
-            querySnapshotC.forEach((docC) => {
-                docsC.push({...docC.data(), id:docC.id});
-            });
-            setMueblesData(docsC);
-        };
-        getMuebles();
-
-        const getEscritorios = async () => {  
-            const qE = query (collection(db, "escritorios"));
-            const docsE =[];
-            const querySnapshotE = await getDocs(qE);
-            querySnapshotE.forEach((docE) => {
-                docsE.push({...docE.data(), id:docE.id});
-            });
-            setEscritoriosData(docsE);
-        };
-        getEscritorios();
-        
-    }, []);
   return (
-    
-      <div className="App">
-        <h1>Firebase</h1>
-        <div className="grid-muebles">
-            {mueblesData.map((muebles) => {
-                <CardMuebles mueblesData={muebles} key={muebles.id}/>;
-            })}
+    <Router>
+      <PlayersProvider>
+        <div className="App">
+          <Header />
+          <ResponsiveNavigation />
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/shop" element={<ShopPage />} />
+            <Route path="/mueble-detail/:id" element={<MuebleDetailPage />} />
+            <Route
+              path="/mueble-position/:position"
+              element={<MueblePositionPage />}   ----
+            />
+          </Routes>
         </div>
-        <div className="grid-muebles">
-            {escritoriosData.map((escritorios) => {
-                return <CardMuebles escritoriosData={escritorios} key={escritorios.id}/>;
-            })}
-            
-        </div>
-        
-      </div>
-    
+      </PlayersProvider>
+    </Router>
   );
 };
 
-export default App
+export default App;
